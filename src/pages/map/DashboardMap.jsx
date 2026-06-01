@@ -2,8 +2,27 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../utils/api";
+import { renderToString } from "react-dom/server";
+import { FaPerson } from "react-icons/fa6";
+import { IoIosDisc } from "react-icons/io";
+
 
 export default function DashboardMap() {
+    const personIcon = L.divIcon({
+        html: renderToString(<FaPerson size={24} color={"green"} />),
+        className: "",
+        iconSize: [24, 24],
+    });
+    const startDisc = L.divIcon({
+        html: renderToString(<IoIosDisc size={24} color={"red"} />),
+        className: "",
+        iconSize: [24, 24],
+    });
+    const endDisc = L.divIcon({
+        html: renderToString(<IoIosDisc size={24} color={"green"} />),
+        className: "",
+        iconSize: [24, 24],
+    });
     const [walkedPath, setWalkedPath] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [lat, setLat] = useState(null);
@@ -106,19 +125,21 @@ export default function DashboardMap() {
                             <Polyline positions={walkedPath} />
 
                             {walkedPath.length > 0 && (
-                                <Marker position={walkedPath[0] || currentLocation}>
+                                <Marker position={walkedPath[0] || currentLocation} icon={startDisc
+                                }>
                                     <Popup>Start</Popup>
                                 </Marker>
                             )}
 
                             {walkedPath.length > 1 && (
-                                <Marker position={walkedPath[walkedPath.length - 1] || currentLocation}>
+                                <Marker position={walkedPath[walkedPath.length - 1] || currentLocation} icon={endDisc
+                                }>
                                     <Popup>End</Popup>
                                 </Marker>
                             )}
                         </>
                     ) : (
-                        <Marker position={currentLocation}>
+                        <Marker position={currentLocation} icon={personIcon} >
                             <Popup>Current Location</Popup>
                         </Marker>
                     )}
