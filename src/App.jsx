@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard"
 import PortectedRoutes from "./utils/protectedRoutes";
 import ProtectedRoutes from './utils/protectedRoutes';
 import "leaflet/dist/leaflet.css";
+import NotFound from './pages/NotFound';
 
 
 function App() {
@@ -19,6 +20,11 @@ function App() {
         <Route element={<ProtectedRoutes />}>
           <Route path='/' exact element={<Dashboard />} />
         </Route>
+
+
+
+        {/* 404 page */}
+        <Route path="*" element={<NotFound />} />
 
 
       </Routes>

@@ -4,17 +4,19 @@ WORKDIR /usr/src/app/frontend
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /usr/src/app/frontend/dist /usr/share/nginx/html
+FROM caddy:alpine
 
-EXPOSE 80
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /usr/src/app/frontend/dist /usr/share/caddy/html
 
-CMD ["nginx","-g","daemon off;"]
+EXPOSE 80 443
+
+
+CMD ["caddy","run","--config","/etc/caddy/Caddyfile"]
