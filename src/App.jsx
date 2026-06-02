@@ -6,29 +6,25 @@ import PortectedRoutes from "./utils/protectedRoutes";
 import ProtectedRoutes from './utils/protectedRoutes';
 import "leaflet/dist/leaflet.css";
 import NotFound from './pages/NotFound';
+import { Toaster } from 'react-hot-toast';
 
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-
-
-        {/* protected routes */}
-
-        <Route element={<ProtectedRoutes />}>
-          <Route path='/' exact element={<Dashboard />} />
-        </Route>
-
-
-
-        {/* 404 page */}
-        <Route path="*" element={<NotFound />} />
-
-
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          {/* protected routes */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path='/' exact element={<Dashboard />} />
+          </Route>
+          {/* 404 page */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+      <Toaster />
+    </>
   )
 }
 

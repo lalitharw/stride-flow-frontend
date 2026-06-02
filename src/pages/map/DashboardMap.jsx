@@ -5,6 +5,7 @@ import api from "../../utils/api";
 import { renderToString } from "react-dom/server";
 import { FaPerson } from "react-icons/fa6";
 import { IoIosDisc } from "react-icons/io";
+import { Skeleton } from "@heroui/react";
 
 
 export default function DashboardMap() {
@@ -42,7 +43,8 @@ export default function DashboardMap() {
             }
         }
         catch (err) {
-            alert(err.response?.data.message)
+            console.log(err)
+            alert(err.response?.message || "Something went wrong!")
         }
     }
 
@@ -96,7 +98,7 @@ export default function DashboardMap() {
     }, [startActivity]);
 
     if (!currentLocation) {
-        return "Loading Map...";
+        return <Skeleton animationType="none" className="h-24 rounded-xl" />;
     }
 
     const mapCenter = startActivity && walkedPath.length > 0
@@ -131,7 +133,7 @@ export default function DashboardMap() {
                                 </Marker>
                             )}
 
-                            {walkedPath.length > 1 && (
+                            {walkedPath.length > 0 && (
                                 <Marker position={walkedPath[walkedPath.length - 1] || currentLocation} icon={endDisc
                                 }>
                                     <Popup>End</Popup>
