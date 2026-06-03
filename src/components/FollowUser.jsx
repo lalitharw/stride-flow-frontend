@@ -5,14 +5,7 @@ export default function FollowUser({ currentLocation, startActivity }) {
     const map = useMap();
 
     useEffect(() => {
-        console.log("FollowUser:", {
-            startActivity,
-            currentLocation,
-            center: map.getCenter(),
-        });
-
         if (!startActivity || !currentLocation) return;
-
         map.panTo(currentLocation, {
             animate: true,
             duration: 1,
