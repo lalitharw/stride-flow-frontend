@@ -48,5 +48,5 @@ jobs:
           script: |
             ${{ secrets.ECR_LOGIN }}
             cd stride_flow
-            sed -i "s|stride_flow_frontend:*|stride_flow_frontend:${{ github.sha }}|" docker-compose-prod.yaml
+            sed -i "s|stride_flow_frontend:.*|stride_flow_frontend:${{ github.sha }}|" docker-compose-prod.yaml
             docker compose -f docker-compose-prod.yaml up -d
