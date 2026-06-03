@@ -77,7 +77,8 @@ export default function DashboardMap() {
             const activity = JSON.parse(localStorage.getItem("activity"))
             const response = await api.patch(`activities/stop-activity/${activity.id}`)
             if (response.data.success === true) {
-                alert(response.data.message)
+                // alert(response.data.message)
+                toast.success(response.data.message)
                 localStorage.removeItem("activity")
                 setStartActivity(false)
                 setWalkedPath([])
