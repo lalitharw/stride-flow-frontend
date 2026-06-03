@@ -48,5 +48,5 @@ jobs:
           script: |
             ${{ secrets.ECR_LOGIN }}
             cd stride_flow
-            sed 's/962765735019.dkr.ecr.eu-north-1.amazonaws.com/stride_flow_frontend:${{ github.event.before }}/962765735019.dkr.ecr.eu-north-1.amazonaws.com/stride_flow_frontend:${{ github.sha }}/' docker-compose-prod.yaml
+            sed -i 's|962765735019.dkr.ecr.eu-north-1.amazonaws.com/stride_flow_frontend:${{ github.event.before }}|962765735019.dkr.ecr.eu-north-1.amazonaws.com/stride_flow_frontend:${{ github.sha }}|' docker-compose-prod.yaml
             docker-compose -f docker-compose-prod.yaml up -d
