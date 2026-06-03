@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import "@maptiler/sdk/dist/maptiler-sdk.css";
-import * as maptilersdk from '@maptiler/sdk';
 import api from "../../utils/api";
 import { renderToString } from "react-dom/server";
 import { FaPerson } from "react-icons/fa6";
