@@ -57,7 +57,7 @@ export default function DashboardMap() {
             }
         }
         catch (err) {
-            console.log(err)
+            console.log(err.message)
             // alert(err.response?.message || "Something went wrong!")
             toast.error(err.response?.message || "Something went wrong!")
         }
