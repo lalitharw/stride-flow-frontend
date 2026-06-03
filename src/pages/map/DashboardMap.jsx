@@ -19,6 +19,7 @@ export default function DashboardMap() {
     const [accuracy, setAccuracy] = useState(null);
     const [startActivity, setStartActivity] = useState(false);
     const [loadingStartActivity, setLoadingStartActivity] = useState(false)
+    const [loadingStopActivity, setLoadingStopActivity] = useState(false)
 
     const pulseIcon = L.divIcon({
         className: "",
@@ -73,6 +74,7 @@ export default function DashboardMap() {
 
     const handleStopActivity = async (event) => {
         event.preventDefault()
+        setLoadingStopActivity(true)
         try {
             const activity = JSON.parse(localStorage.getItem("activity"))
             const response = await api.patch(`activities/stop-activity/${activity.id}`)
@@ -87,6 +89,9 @@ export default function DashboardMap() {
         catch (error) {
             // alert(error.response?.data.message)
             toast.error(error.response?.message || "Something went wrong!")
+        }
+        finally{
+            setLoadingStopActivity(false)
         }
     }
 
@@ -142,7 +147,13 @@ export default function DashboardMap() {
     return (
         <>
             <div className="flex items-center justify-center">
-                {startActivity ? (<Button className="w-[200px]" onClick={handleStopActivity}>Stop</Button>) : (<Button isPending={loadingStartActivity} className="w-[200px]" onClick={handleStartActivity}>{({ isPending }) => (
+                {startActivity ? (<Button isPending={loadingStopActivity} className="w-[200px]" onClick={handleStopActivity}>
+                    {({ isPending }) => (
+                    <>
+                        {isPending ? <Spinner color="current" size="sm" /> : "Stop"}
+                    </>
+                )}
+                </Button>) : (<Button isPending={loadingStartActivity} className="w-[200px]" onClick={handleStartActivity}>{({ isPending }) => (
                     <>
                         {isPending ? <Spinner color="current" size="sm" /> : "Start"}
                     </>
