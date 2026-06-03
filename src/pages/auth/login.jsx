@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom"
 import AlertMessage from "../../components/AlertMessage";
 import toast from "react-hot-toast"
 
+
 // useEffect(() => {
 
 // }, [])
@@ -33,12 +34,14 @@ function Login() {
 
         }
         catch (error) {
-            setLoading(false)
+
             setEmail("")
             setPassword("")
             console.log(error)
             toast.error(error.response?.data.message || "Something went wrong!")
-            return
+        }
+        finally {
+            setLoading(false)
         }
 
     }
