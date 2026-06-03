@@ -49,7 +49,8 @@ export default function DashboardMap() {
         try {
             const response = await api.post("/activities")
             if (response.data.success === true) {
-                alert(response.data.message)
+                // alert(response.data.message)
+                toast.success(response.data.message)
                 localStorage.setItem("activity", JSON.stringify(response.data.data?.activity))
                 setStartActivity(true)
                 setWalkedPath([currentLocation])

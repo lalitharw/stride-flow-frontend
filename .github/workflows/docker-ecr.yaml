@@ -37,3 +37,16 @@ jobs:
           --build-arg VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} \
           -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: Execute Remote SSH Commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            ${{ secrets.ECR_LOGIN }}
+            cd stride_flow
+            sed 's/962765735019.dkr.ecr.eu-north-1.amazonaws.com/stride_flow_frontend:${{ github.event.before }}/962765735019.dkr.ecr.eu-north-1.amazonaws.com/stride_flow_frontend:${{ github.sha }}/' docker-compose-prod.yaml
+            docker-compose -f docker-compose-prod.yaml up -d
