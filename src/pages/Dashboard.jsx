@@ -43,7 +43,7 @@ function Dashboard() {
                     <DropdownTrigger>
                         <div className="flex items-center justify-center gap-2 cursor-pointer">
                             <FaRegUserCircle className="text-2xl" />
-                            <p>Hello, {user?.name ?? "Guest"}</p>
+                            <p>Hello, {user?.email ?? "Guest"}</p>
                         </div>
                     </DropdownTrigger>
                     <DropdownPopover>
