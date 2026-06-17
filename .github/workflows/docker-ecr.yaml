@@ -3,7 +3,7 @@ name: build and push image to ecr
 on:
   push:
     braches:
-      - main
+      - feature
 env:
   AWS_REGION: eu-north-1
   ECR_REPOSITORY: stride_flow_frontend

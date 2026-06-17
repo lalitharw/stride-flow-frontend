@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../utils/api";
@@ -9,15 +9,27 @@ import { Separator, Skeleton, Button, Spinner } from "@heroui/react";
 import toast from "react-hot-toast"
 import "../../css/pulse_icon.css"
 import FollowUser from "../../components/FollowUser";
+import HaverSineDistance from "../../utils/HaverSineDistance";
+
 
 
 export default function DashboardMap() {
-    const [walkedPath, setWalkedPath] = useState([]);
+    const [walkedPath, setWalkedPath] = useState(() => {
+        const saved = localStorage.getItem("walked_path")
+        return saved ? JSON.parse(saved) : []
+    });
     const [currentLocation, setCurrentLocation] = useState(null);
     const [lat, setLat] = useState(null);
     const [long, setLong] = useState(null);
     const [accuracy, setAccuracy] = useState(null);
-    const [startActivity, setStartActivity] = useState(false);
+    const sequenceRef = useRef(0)
+    const [pendingPoints, setPendingPoints] = useState(() => {
+        const saved = localStorage.getItem("pending_points")
+        return saved ? JSON.parse(saved) : []
+    })
+    const [startActivity, setStartActivity] = useState(() => {
+        return !!localStorage.getItem("activity")
+    });
     const [loadingStartActivity, setLoadingStartActivity] = useState(false)
     const [loadingStopActivity, setLoadingStopActivity] = useState(false)
 
@@ -54,7 +66,9 @@ export default function DashboardMap() {
                 toast.success(response.data.message)
                 localStorage.setItem("activity", JSON.stringify(response.data.data?.activity))
                 setStartActivity(true)
-                setWalkedPath([currentLocation])
+                sequenceRef.current += 1
+                localStorage.setItem("mysequence", sequenceRef.current)
+                // setWalkedPath([currentLocation])
 
             }
         }
@@ -73,7 +87,7 @@ export default function DashboardMap() {
     }
 
     const handleStopActivity = async (event) => {
-        event.preventDefault()
+        event?.preventDefault()
         setLoadingStopActivity(true)
         try {
             const activity = JSON.parse(localStorage.getItem("activity"))
@@ -82,19 +96,45 @@ export default function DashboardMap() {
                 // alert(response.data.message)
                 toast.success(response.data.message)
                 localStorage.removeItem("activity")
+                localStorage.removeItem("walked_path")
+                localStorage.removeItem("pending_points")
                 setStartActivity(false)
                 setWalkedPath([])
+                setPendingPoints([])
+                sequenceRef.current = 0
+                localStorage.removeItem("mysequence")
             }
         }
         catch (error) {
             // alert(error.response?.data.message)
-            toast.error(error.response?.message || "Something went wrong!")
+            toast.error(error.response?.data.message || "Something went wrong!")
         }
-        finally{
+        finally {
             setLoadingStopActivity(false)
         }
     }
 
+    const handleStoreActivity = async (path) => {
+        const activity = JSON.parse(localStorage.getItem("activity"))
+        try {
+            const response = await api.post(`activity-points`, {
+                "co_ordinates": path,
+                "activity_id": activity.id,
+                "sequence": sequenceRef.current
+            })
+            sequenceRef.current += 1
+            localStorage.setItem("mysequence", sequenceRef.current)
+
+
+
+
+        }
+        catch (error) {
+            toast.error(error.response?.message || "Something went wrong!")
+        }
+    }
+
+    // geolocation navigator
     useEffect(() => {
         const watchId = navigator.geolocation.watchPosition(
             (position) => {
@@ -109,7 +149,23 @@ export default function DashboardMap() {
                 setCurrentLocation(point);
 
                 if (startActivity) {
-                    setWalkedPath((oldPath) => [...oldPath, point]);
+                    setWalkedPath((oldPath) => {
+                        const newPath = [...oldPath, point];
+                        localStorage.setItem(
+                            "walked_path",
+                            JSON.stringify(newPath)
+                        );
+                        return newPath;
+                    });
+
+                    setPendingPoints((prev) => {
+                        const points = [...prev, point]
+                        localStorage.setItem(
+                            "pending_points",
+                            JSON.stringify(points)
+                        )
+                        return points
+                    })
                 }
             },
             (error) => {
@@ -126,6 +182,79 @@ export default function DashboardMap() {
             navigator.geolocation.clearWatch(watchId);
         };
     }, [startActivity]);
+
+
+    // to save batch points
+    const [isUploading, setIsUploading] = useState(false);
+
+    useEffect(() => {
+        if (
+            !startActivity ||
+            isUploading ||
+            pendingPoints.length < 10
+        ) {
+            return;
+        }
+
+        const uploadBatch = async () => {
+            const batch = pendingPoints.slice(0, 10);
+
+            try {
+                setIsUploading(true);
+
+                await handleStoreActivity(batch);
+
+                setPendingPoints(prev => prev.slice(10));
+            } finally {
+                setIsUploading(false);
+            }
+        };
+
+        uploadBatch();
+    }, [pendingPoints, startActivity, isUploading]);
+
+
+    useEffect(() => {
+        localStorage.setItem(
+            "pending_points",
+            JSON.stringify(pendingPoints)
+        );
+    }, [pendingPoints]);
+
+
+    // useEffect(() => {
+    //     console.log(walkedPath)
+    //     console.log("Inside walkedpath useEffect")
+    //     if (!startActivity) return;
+
+
+    //     if (walkedPath.length > 10) {
+    //         handleStoreActivity(walkedPath)
+    //     }
+    // }
+
+    //     , [walkedPath])
+
+
+    // use Effect to check time of inactivity
+    useEffect(() => {
+        if (!startActivity || walkedPath.length < 2) return;
+        const timer = setTimeout(() => {
+            const last = walkedPath[walkedPath.length - 1]
+            const prev = walkedPath[walkedPath.length - 2]
+
+            const distance = HaverSineDistance(last, prev)
+
+            if (distance < 5) {
+                handleStopActivity()
+                toast("Activity auto-stopped due to inactivity")
+            }
+        }, 5 * 60 * 1000)
+
+        return () => clearTimeout(timer);
+
+    }, [walkedPath])
+
 
 
 
@@ -149,10 +278,10 @@ export default function DashboardMap() {
             <div className="flex items-center justify-center">
                 {startActivity ? (<Button isPending={loadingStopActivity} className="w-[200px]" onClick={handleStopActivity}>
                     {({ isPending }) => (
-                    <>
-                        {isPending ? <Spinner color="current" size="sm" /> : "Stop"}
-                    </>
-                )}
+                        <>
+                            {isPending ? <Spinner color="current" size="sm" /> : "Stop"}
+                        </>
+                    )}
                 </Button>) : (<Button isPending={loadingStartActivity} className="w-[200px]" onClick={handleStartActivity}>{({ isPending }) => (
                     <>
                         {isPending ? <Spinner color="current" size="sm" /> : "Start"}
@@ -160,6 +289,7 @@ export default function DashboardMap() {
                 )}</Button>)}
             </div>
             <Separator className="my-5" />
+
             <p className="mb-[5px]">Lat: {lat}, Long: {long}, Accuracy: {accuracy}</p>
 
             <div className="container rounded-lg shadow-xl" style={{ height: "500px" }}>
