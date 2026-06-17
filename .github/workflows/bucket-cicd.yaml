@@ -2,12 +2,12 @@ name: Build React App and Push to Bucket
 
 on:
   push:
-    braches:
+    branches:
       - main
 
 env:
   AWS_REGION: us-east-1
-  
+
 jobs:
   build_app:
     runs-on: ubuntu-latest
