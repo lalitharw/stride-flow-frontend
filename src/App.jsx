@@ -11,10 +11,6 @@ import { Toaster } from 'react-hot-toast';
 import HistoryData from './pages/HistoryData';
 import PublicRoutes from './utils/PublicRoutes';
 
-
-
-
-
 function App() {
   return (
     <>
