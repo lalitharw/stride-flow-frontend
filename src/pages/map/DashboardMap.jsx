@@ -13,7 +13,7 @@ import HaverSineDistance from "../../utils/HaverSineDistance";
 
 
 
-export default function DashboardMap() {
+export default function DashboardMap({ onActivityStopped }) {
     const [walkedPath, setWalkedPath] = useState(() => {
         const saved = localStorage.getItem("walked_path")
         return saved ? JSON.parse(saved) : []
@@ -89,8 +89,17 @@ export default function DashboardMap() {
     const handleStopActivity = async (event) => {
         event?.preventDefault()
         setLoadingStopActivity(true)
+        const activity = JSON.parse(localStorage.getItem("activity"))
+        const pendingPoints = JSON.parse(localStorage.getItem("pending_points") || [])
+
+        if (!activity) {
+            toast.error("No active activity Found!")
+            return
+        }
+
         try {
-            const activity = JSON.parse(localStorage.getItem("activity"))
+
+            await handleStoreActivity(pendingPoints)
             const response = await api.patch(`activities/stop-activity/${activity.id}`)
             if (response.data.success === true) {
                 // alert(response.data.message)
@@ -103,6 +112,7 @@ export default function DashboardMap() {
                 setPendingPoints([])
                 sequenceRef.current = 0
                 localStorage.removeItem("mysequence")
+                onActivityStopped?.();
             }
         }
         catch (error) {
