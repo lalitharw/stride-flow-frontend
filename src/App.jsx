@@ -9,6 +9,7 @@ import "leaflet/dist/leaflet.css";
 import NotFound from './pages/NotFound';
 import { Toaster } from 'react-hot-toast';
 import HistoryData from './pages/HistoryData';
+import PublicRoutes from './utils/PublicRoutes';
 
 
 
@@ -19,13 +20,18 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
           {/* protected routes */}
           <Route element={<ProtectedRoutes />}>
             <Route path='/' exact element={<Dashboard />} />
             <Route path="/activity" exact element={<History />} />
             <Route path="/activity/:activityId" element={<HistoryData />} />
           </Route>
+
+          {/* public routes */}
+          <Route element={<PublicRoutes />}>
+            <Route path="/login" exact element={<Login />} />
+          </Route>
+
           {/* 404 page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
