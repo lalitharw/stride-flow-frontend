@@ -21,7 +21,7 @@ env:
 
 jobs:
   build_app:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'yes'
+    if: ${{github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'yes'}}
     runs-on: ubuntu-latest
 
     steps:
