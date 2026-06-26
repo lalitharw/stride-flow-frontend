@@ -10,18 +10,18 @@ on:
       deploy:
         description: "Deploy to S3?"
         required: false
-        default: "no"
+        default: "no-deploy"
         type: choice
         options:
-          - yes
-          - no
+          - deploy
+          - no-deploy
 
 env:
   AWS_REGION: us-east-1
 
 jobs:
   build_app:
-    if: ${{github.event.inputs.deploy == 'yes'}}
+    if: ${{github.event.inputs.deploy == 'deploy'}}
     runs-on: ubuntu-latest
 
     steps:
