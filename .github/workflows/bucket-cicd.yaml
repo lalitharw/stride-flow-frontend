@@ -6,15 +6,15 @@ on:
       - main
 
   workflow_dispatch:
-  inputs:
-    deploy:
-      description: "Deploy to S3?"
-      required: true
-      default: "no"
-      type: choice
-      options:
-        - yes
-        - no
+    inputs:
+      deploy:
+        description: "Deploy to S3?"
+        required: true
+        default: "no"
+        type: choice
+        options:
+          - yes
+          - no
 
 env:
   AWS_REGION: us-east-1
