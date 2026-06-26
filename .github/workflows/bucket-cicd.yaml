@@ -11,7 +11,7 @@ on:
         description: "Deploy to S3?"
         required: false
         default: "no"
-        type: boolean
+        type: choice
         options:
           - yes
           - no
