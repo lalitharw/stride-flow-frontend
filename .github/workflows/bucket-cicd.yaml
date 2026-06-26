@@ -10,11 +10,11 @@ on:
       deploy:
         description: "Deploy to S3?"
         required: true
-        default: "no"
-        type: choice
+        default: false
+        type: boolean
         options:
-          - yes
-          - no
+          - true
+          - false
 
 env:
   AWS_REGION: us-east-1
