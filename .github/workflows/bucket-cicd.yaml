@@ -6,21 +6,22 @@ on:
       - main
 
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Do you want to deploy?"
-        required: false
-        default: "no"
-        type: choice
-        options:
-          - yes
-          - no
+  inputs:
+    deploy:
+      description: "Deploy to S3?"
+      required: true
+      default: "no"
+      type: choice
+      options:
+        - yes
+        - no
 
 env:
   AWS_REGION: us-east-1
 
 jobs:
   build_app:
+    if: ${{github.event.inputs.deploy == 'yes'}}
     runs-on: ubuntu-latest
 
     steps:
@@ -40,11 +41,6 @@ jobs:
         run: |
           echo "VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }}" >> .env.production
 
-  deploy:
-    if: ${{github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'yes'}}
-    needs: build_app
-    runs-on: ubuntu-latest
-    steps:
       - name: Build the application
         run: npm run build
       
