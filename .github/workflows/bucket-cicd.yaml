@@ -10,7 +10,7 @@ on:
       environment:
         description: "Do you want to deploy?"
         required: false
-        default: no
+        default: "no"
         type: choice
         options:
           - yes
@@ -21,7 +21,6 @@ env:
 
 jobs:
   build_app:
-    if: ${{github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'yes'}}
     runs-on: ubuntu-latest
 
     steps:
@@ -41,6 +40,11 @@ jobs:
         run: |
           echo "VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }}" >> .env.production
 
+  deploy:
+    if: ${{github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'yes'}}
+    needs: build_app
+    runs-on: ubuntu-latest
+    steps:
       - name: Build the application
         run: npm run build
       
