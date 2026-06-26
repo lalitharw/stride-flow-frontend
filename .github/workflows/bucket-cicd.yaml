@@ -21,7 +21,7 @@ env:
 
 jobs:
   build_app:
-    if: ${{github.event.inputs.deploy == 'yes'}}
+    if: ${{github.event.inputs.deploy == true}}
     runs-on: ubuntu-latest
 
     steps:
