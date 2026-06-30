@@ -20,7 +20,7 @@ function Login() {
         event.preventDefault()
         setLoading(true)
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}auth/login`, {
+            const response = await axios.post(`https://api.lalitharwate.in/api/v1/auth/login`, {
                 email,
                 password
             })
